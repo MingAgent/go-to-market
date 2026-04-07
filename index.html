@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mingma GTM ‚Äî Strategic Intake</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #000000;
+    color: #FFFFFF;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* Progress Bar */
+  .progress-bar { height: 4px; background: rgba(255,255,255,0.1); position: relative; }
+  .progress-fill {
+    height: 100%; background: #14B8A6;
+    transition: width 0.4s ease-out;
+    box-shadow: 0 0 20px rgba(20,184,166,0.5);
+  }
+
+  /* Step Counter */
+  .step-counter {
+    padding: 16px 24px; text-align: center;
+    color: #9CA3AF; font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; justify-content: center; align-items: center; gap: 12px;
+  }
+  .save-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(20,184,166,0.1);
+    border: 1px solid rgba(20,184,166,0.3);
+    font-size: 11px; color: #14B8A6;
+    transition: all 0.3s;
+  }
+  .save-badge.saving { color: #FBBF24; border-color: rgba(234,179,8,0.3); background: rgba(234,179,8,0.1); }
+  .save-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #14B8A6; }
+  .save-badge.saving .dot { background: #FBBF24; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Section Label */
+  .section-label {
+    display: inline-block; padding: 4px 12px; border-radius: 6px;
+    background: rgba(20,184,166,0.12); color: #14B8A6;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+
+  /* Main Container */
+  .main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; min-height: calc(100vh - 60px); }
+
+  /* Card */
+  .card {
+    width: 100%; max-width: 680px;
+    padding: 40px 32px; border-radius: 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(20,184,166,0.2);
+    box-shadow: 0 0 30px rgba(20,184,166,0.15);
+    position: relative;
+  }
+
+  /* Slide Animations */
+  .slide-in-right { animation: slideInRight 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .slide-in-left { animation: slideInLeft 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes slideInRight { from { transform: translateX(60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes slideInLeft { from { transform: translateX(-60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes scaleIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes glow {
+    0%,100% { box-shadow: 0 0 30px rgba(20,184,166,0.3), 0 0 60px rgba(20,184,166,0.15); }
+    50% { box-shadow: 0 0 50px rgba(20,184,166,0.5), 0 0 100px rgba(20,184,166,0.25); }
+  }
+  @keyframes fadeInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* Question Title */
+  .question-title { font-size: 26px; font-weight: 600; margin-bottom: 28px; line-height: 1.3; }
+
+  /* Text Inputs */
+  .text-input {
+    width: 100%; padding: 16px; border-radius: 12px;
+    border: 1px solid rgba(20,184,166,0.3);
+    background: rgba(255,255,255,0.05);
+    color: #FFFFFF; font-size: 16px;
+    font-family: inherit;
+    transition: all 0.3s; outline: none;
+  }
+  .text-input:focus {
+    border-color: #14B8A6;
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 20px rgba(20,184,166,0.2);
+  }
+  .text-input::placeholder { color: #6B7280; }
+
+  /* Currency Wrapper */
+  .currency-wrap { position: relative; }
+  .currency-symbol {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: #14B8A6; font-size: 18px; font-weight: 600; pointer-events: none;
+  }
+  .currency-wrap .text-input { padding-left: 36px; }
+
+  /* Textarea */
+  textarea.text-input { resize: vertical; min-height: 120px; }
+
+  /* Voice-to-text button */
+  .voice-btn {
+    position: absolute; right: 12px; bottom: 12px;
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid rgba(20,184,166,0.3);
+    background: rgba(20,184,166,0.08);
+    color: #14B8A6; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
+  }
+  .voice-btn:hover { background: rgba(20,184,166,0.2); border-color: #14B8A6; box-shadow: 0 0 15px rgba(20,184,166,0.3); }
+  .voice-btn.recording { background: rgba(239,68,68,0.2); border-color: #EF4444; color: #EF4444; animation: pulse 1s infinite; }
+  .voice-btn svg { width: 20px; height: 20px; }
+  .textarea-wrap { position: relative; }
+
+  /* Slider */
+  .slider-wrap { margin-bottom: 16px; }
+  input[type="range"] {
+    width: 100%; height: 6px; border-radius: 3px;
+    outline: none; -webkit-appearance: none; appearance: none;
+    background: rgba(255,255,255,0.1); margin-bottom: 24px;
+  }
+  input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #14B8A6; cursor: pointer;
+    box-shadow: 0 0 15px rgba(20,184,166,0.4);
+    margin-top: -8px; transition: all 0.2s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover {
+    width: 26px; height: 26px; margin-top: -10px;
+    box-shadow: 0 0 25px rgba(20,184,166,0.6);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #14B8A6; cursor: pointer; border: none;
+    box-shadow: 0 0 15px rgba(20,184,166,0.4);
+  }
+  input[type="range"]::-moz-range-track { background: transparent; border: none; }
+  .slider-value { color: #14B8A6; font-size: 28px; font-weight: 700; }
+  .slider-helper { color: #9CA3AF; font-size: 14px; margin-top: 8px; }
+
+  /* Card Select */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .card-option {
+    padding: 16px; border-radius: 12px;
+    border: 2px solid rgba(20,184,166,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #FFFFFF; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    text-align: center; font-family: inherit;
+  }
+  .card-option:hover {
+    border-color: rgba(20,184,166,0.5);
+    background: rgba(255,255,255,0.08);
+  }
+  .card-option.selected {
+    border-color: #14B8A6;
+    background: rgba(20,184,166,0.15);
+    box-shadow: 0 0 20px rgba(20,184,166,0.3);
+  }
+
+  /* Multi-Select */
+  .multi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .multi-count { color: #9CA3AF; font-size: 12px; }
+
+  /* Month Calendar Picker (dual-mode) */
+  .month-calendar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  .month-btn {
+    padding: 14px 8px; border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    color: #9CA3AF; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    text-align: center; font-family: inherit;
+  }
+  .month-btn:hover { border-color: rgba(255,255,255,0.3); }
+  .month-btn.peak { border-color: #14B8A6; background: rgba(20,184,166,0.15); color: #14B8A6; }
+  .month-btn.slow { border-color: #F59E0B; background: rgba(245,158,11,0.12); color: #F59E0B; }
+  .month-legend { display: flex; gap: 20px; margin-top: 12px; font-size: 13px; color: #9CA3AF; }
+  .month-legend span { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .legend-dot.peak { background: #14B8A6; }
+  .legend-dot.slow { background: #F59E0B; }
+
+  /* Funnel Visualization */
+  .funnel-stage { margin-bottom: 20px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
+  .funnel-label { font-size: 14px; color: #9CA3AF; margin-bottom: 8px; }
+  .funnel-result { font-size: 13px; color: #14B8A6; margin-top: 6px; font-weight: 500; }
+
+  /* Info Tooltip */
+  .info-box {
+    margin-bottom: 24px; padding: 12px 16px; border-radius: 8px;
+    background: rgba(63,170,235,0.1);
+    border: 1px solid rgba(63,170,235,0.3);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .info-icon { flex-shrink: 0; margin-top: 2px; }
+  .info-text { color: #9CA3AF; font-size: 14px; line-height: 1.5; }
+
+  /* I Don't Know Checkbox */
+  .idk-wrap {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 20px; padding: 12px 16px; border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer; transition: all 0.2s;
+    user-select: none;
+  }
+  .idk-wrap:hover { border-color: rgba(20,184,166,0.4); background: rgba(255,255,255,0.05); }
+  .idk-wrap.checked { border-color: #14B8A6; background: rgba(20,184,166,0.08); }
+  .idk-box {
+    width: 20px; height: 20px; border-radius: 4px;
+    border: 2px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .idk-box.checked { border-color: #14B8A6; background: #14B8A6; }
+  .idk-label { color: #9CA3AF; font-size: 14px; }
+  .idk-wrap.checked .idk-label { color: #14B8A6; }
+  .slider-disabled { opacity: 0.3; pointer-events: none; }
+
+  /* Delegate Panel */
+  .delegate-panel {
+    margin-top: 16px; padding: 16px; border-radius: 12px;
+    background: rgba(139,92,246,0.06);
+    border: 1px solid rgba(139,92,246,0.25);
+    animation: fadeInUp 0.3s ease-out;
+  }
+  .delegate-panel h4 { font-size: 14px; font-weight: 600; color: #A78BFA; margin-bottom: 12px; }
+  .delegate-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .delegate-row input {
+    flex: 1; padding: 10px 14px; border-radius: 8px;
+    border: 1px solid rgba(139,92,246,0.3);
+    background: rgba(255,255,255,0.05);
+    color: #FFFFFF; font-size: 14px; font-family: inherit;
+    outline: none; transition: all 0.3s;
+  }
+  .delegate-row input:focus { border-color: #A78BFA; box-shadow: 0 0 15px rgba(139,92,246,0.2); }
+  .delegate-row input::placeholder { color: #6B7280; }
+  .delegate-note { font-size: 12px; color: #9CA3AF; line-height: 1.4; }
+
+  /* Delegate Toggle */
+  .delegate-toggle {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 16px; padding: 10px 14px; border-radius: 10px;
+    background: rgba(139,92,246,0.04);
+    border: 1px solid rgba(139,92,246,0.15);
+    cursor: pointer; transition: all 0.2s; user-select: none;
+  }
+  .delegate-toggle:hover { border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.08); }
+  .delegate-toggle.active { border-color: #A78BFA; background: rgba(139,92,246,0.1); }
+  .delegate-toggle svg { color: #A78BFA; flex-shrink: 0; }
+  .delegate-toggle-label { color: #9CA3AF; font-size: 13px; }
+  .delegate-toggle.active .delegate-toggle-label { color: #A78BFA; }
+
+  /* Smart Warning */
+  .smart-warning {
+    margin-top: 16px; padding: 14px 16px; border-radius: 10px;
+    background: rgba(234,179,8,0.08);
+    border: 1px solid rgba(234,179,8,0.3);
+    display: flex; gap: 12px; align-items: flex-start;
+    animation: fadeInUp 0.3s ease-out;
+  }
+  .smart-warning .warn-icon { flex-shrink: 0; margin-top: 1px; }
+  .smart-warning .warn-text { color: #FBBF24; font-size: 14px; line-height: 1.5; }
+  .smart-warning .warn-text strong { color: #FDE68A; }
+  .smart-warning .warn-dismiss {
+    display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 6px;
+    background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.3);
+    color: #FBBF24; font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .smart-warning .warn-dismiss:hover { background: rgba(234,179,8,0.25); }
+
+  /* Validation Error */
+  .error { color: #EF4444; font-size: 14px; margin-top: 8px; display: flex; gap: 8px; align-items: center; }
+
+  /* Navigation */
+  .nav { display: flex; gap: 12px; margin-top: 32px; }
+  .btn-back {
+    padding: 12px 24px; border-radius: 12px;
+    border: 1px solid #9CA3AF; background: transparent;
+    color: #FFFFFF; font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    transition: all 0.3s; font-family: inherit;
+  }
+  .btn-back:hover { border-color: #14B8A6; color: #14B8A6; }
+  .btn-back:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-back:disabled:hover { border-color: #9CA3AF; color: #FFFFFF; }
+  .btn-next {
+    flex: 1; padding: 12px 24px; border-radius: 12px;
+    border: none; background: #14B8A6;
+    color: #000000; font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    transition: all 0.3s; font-family: inherit;
+    box-shadow: 0 0 20px rgba(20,184,166,0.3);
+  }
+  .btn-next:hover { box-shadow: 0 0 40px rgba(20,184,166,0.6); }
+  .btn-skip {
+    padding: 12px 20px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15); background: transparent;
+    color: #6B7280; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.3s; font-family: inherit;
+  }
+  .btn-skip:hover { border-color: rgba(255,255,255,0.3); color: #9CA3AF; }
+
+  .save-note { color: #6B7280; font-size: 12px; text-align: center; margin-top: 16px; }
+
+  /* Resume Banner */
+  .resume-banner {
+    padding: 16px 24px; text-align: center;
+    background: rgba(20,184,166,0.08);
+    border-bottom: 1px solid rgba(20,184,166,0.2);
+    animation: fadeInUp 0.4s ease-out;
+  }
+  .resume-banner p { color: #14B8A6; font-size: 14px; margin-bottom: 8px; }
+  .resume-banner button {
+    padding: 8px 20px; border-radius: 8px;
+    border: 1px solid #14B8A6; background: rgba(20,184,166,0.1);
+    color: #14B8A6; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; margin: 0 6px;
+    transition: all 0.2s;
+  }
+  .resume-banner button:hover { background: rgba(20,184,166,0.2); }
+  .resume-banner .btn-restart { border-color: #6B7280; color: #6B7280; background: transparent; }
+
+  /* Summary */
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 32px; }
+  .summary-section { margin-bottom: 24px; }
+  .summary-section-title { color: #14B8A6; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(20,184,166,0.2); }
+  .summary-item { padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .summary-label { color: #14B8A6; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+  .summary-value { color: #FFFFFF; font-size: 15px; }
+  .summary-delegated { color: #A78BFA; font-size: 12px; font-style: italic; }
+
+  /* Success */
+  .success-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(20,184,166,0.15);
+    border: 2px solid #14B8A6;
+    display: inline-flex; align-items: center; justify-content: center;
+    animation: scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1), glow 2s ease-in-out infinite;
+    margin-bottom: 24px;
+  }
+
+  /* SVG Icons */
+  .icon { display: inline-block; vertical-align: middle; }
+
+  @media (max-width: 600px) {
+    .card { padding: 28px 20px; }
+    .question-title { font-size: 22px; }
+    .card-grid, .multi-grid { grid-template-columns: 1fr 1fr; }
+    .month-calendar { grid-template-columns: repeat(3, 1fr); }
+    .summary-grid { grid-template-columns: 1fr; }
+    .delegate-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+<div class="step-counter" id="stepCounter">
+  <span id="stepText"></span>
+  <span class="save-badge" id="saveBadge"><span class="dot"></span>Saved</span>
+</div>
+<div id="resumeBanner"></div>
+<div class="main"><div id="questionContainer" class="card slide-in-right"></div></div>
+
+<script>
+// ‚îÄ‚îÄ‚îÄ CONFIG ‚îÄ‚îÄ‚îÄ
+const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co'; // TODO: Replace with actual Supabase URL
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // TODO: Replace with actual anon key
+const WEBHOOK_URL = 'https://n8n.mingma.io/webhook/client-intake-unified';
+const DELEGATE_WEBHOOK_URL = 'https://n8n.mingma.io/webhook/client-intake-delegate-request';
+const ACCOUNT_CREATE_URL = 'https://n8n.mingma.io/webhook/client-intake-account-create';
+
+// ‚îÄ‚îÄ‚îÄ SESSION ‚îÄ‚îÄ‚îÄ
+const urlParams = new URLSearchParams(window.location.search);
+let SESSION_ID = urlParams.get('session') || localStorage.getItem('mingma_intake_session') || null;
+let resumedStep = null;
+
+const ICONS = {
+  chevronLeft: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>',
+  chevronRight: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>',
+  check: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#14B8A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+  checkSmall: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14B8A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+  info: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3FAAEB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>',
+  alert: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>',
+  delegate: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>',
+  warning: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+  checkMark: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+};
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ‚îÄ‚îÄ‚îÄ MERGED QUESTIONS (52 ‚Üí 38 slides) ‚îÄ‚îÄ‚îÄ
+const questions = [
+  // ‚îÄ‚îÄ PHASE 1: Core Identity (must complete to create account) ‚îÄ‚îÄ
+  { id:'name', section:'About You', question:'What is your name?', type:'text', placeholder:'First and Last Name', required:true, phase:1 },
+  { id:'email', section:'About You', question:'What is your email address?', type:'email', placeholder:'you@company.com', required:true, phase:1 },
+  { id:'phone', section:'About You', question:'What is your phone number?', type:'tel', placeholder:'(555) 123-4567', phase:1 },
+  { id:'company_name', section:'About You', question:'What is your company name?', type:'text', placeholder:'Acme Corp', required:true, phase:1 },
+  { id:'company_website', section:'About You', question:'What is your company website?', type:'url', placeholder:'https://yourcompany.com', phase:1 },
+  { id:'linkedin_url', section:'About You', question:'What is your personal LinkedIn URL?', type:'url', placeholder:'https://linkedin.com/in/yourname', phase:1,
+    tooltip:'We use this to research your background, industry connections, and company intel to build a more targeted strategy.' },
+
+  // ‚îÄ‚îÄ PHASE 2: Budget Engine Inputs (7 inputs that drive everything) ‚îÄ‚îÄ
+  { id:'industry', section:'Your Business', question:'What industry are you in?', type:'card-select', phase:2,
+    options:['Construction','Professional Services','Manufacturing','Healthcare','Technology','Distribution','Real Estate','Services','Other'] },
+  { id:'annual_revenue', section:'Your Business', question:'What is your current annual revenue?', type:'card-select', phase:2,
+    options:['$500K\u2013$5M','$5M\u2013$10M','$10M\u2013$25M','$25M\u2013$50M','$50M\u2013$100M','$100M+'] },
+  { id:'employee_count', section:'Your Business', question:'How many employees do you have?', type:'card-select', phase:2,
+    options:['10\u201350','50\u2013100','100\u2013200','200+'] },
+  { id:'annual_sales_goal', section:'Budget Engine', question:'What is your annual sales goal?', type:'currency', placeholder:'20,000,000', phase:2,
+    tooltip:'This is the single most important number \u2014 everything else is calculated from it.' },
+  { id:'marketing_percentage', section:'Budget Engine', question:'What percentage of revenue should go to marketing?', type:'slider', min:1, max:15, default:6, suffix:'%', phase:2,
+    helper: function(a) {
+      let rev = 0;
+      if (a.annual_sales_goal) rev = parseFloat((a.annual_sales_goal+'').replace(/,/g,'')) || 0;
+      if (!rev) {
+        const m = {'$500K\u2013$5M':2750000,'$5M\u2013$10M':7500000,'$10M\u2013$25M':17500000,'$25M\u2013$50M':37500000,'$50M\u2013$100M':75000000,'$100M+':150000000};
+        rev = m[a.annual_revenue]||0;
+      }
+      const pct = a.marketing_percentage||6;
+      const b = rev * pct / 100;
+      if (b <= 0) return '';
+      return b >= 1000000 ? 'Estimated budget: ~$'+(b/1000000).toFixed(1)+'M/yr' : 'Estimated budget: ~$'+Math.round(b/1000).toLocaleString()+'K/yr';
+    }
+  },
+  { id:'average_deal_size', section:'Budget Engine', question:'What is your average deal or job size?', type:'currency', placeholder:'250,000', phase:2, delegatable:true },
+
+  // ‚îÄ‚îÄ Merged: Sales Funnel (3 sliders ‚Üí 1 funnel viz) ‚îÄ‚îÄ
+  { id:'sales_funnel', section:'Budget Engine', question:'Walk us through your sales funnel', type:'funnel', phase:2, delegatable:true,
+    tooltip:'Of every 100 leads, how many make it through each stage? Don\u2019t worry about precision \u2014 best estimates work.',
+    stages:[
+      { id:'lead_cancellation_rate', label:'What % of leads cancel or ghost before your team engages?', min:0, max:50, default:10, suffix:'%' },
+      { id:'sales_closing_ratio', label:'Of the remaining leads, what % does your team close?', min:5, max:50, default:20, suffix:'%' },
+      { id:'job_rescission_rate', label:'Of closed deals, what % fall through after signing?', min:0, max:25, default:0, suffix:'%' }
+    ]
+  },
+
+  { id:'sales_team_size', section:'Budget Engine', question:'How many people are on your sales team?', type:'number', placeholder:'3', phase:2 },
+
+  // ‚îÄ‚îÄ PHASE 3: Strategic Context ‚îÄ‚îÄ
+  { id:'revenue_growth_target', section:'Goals', question:'What is your revenue growth target for the next 12 months?', type:'slider', min:5, max:100, default:15, suffix:'%', phase:3,
+    helper:'How much do you want to grow year-over-year?' },
+  { id:'primary_goal_12mo', section:'Goals', question:'What is the single most important business outcome you want in the next 12 months?', type:'textarea', phase:3,
+    placeholder:'Be specific \u2014 e.g. "Hit $25M revenue" or "Generate 50 qualified leads per month" or "Launch into 3 new markets"',
+    tooltip:'This becomes the north-star metric we design everything around.' },
+  { id:'top_challenges', section:'Goals', question:'What are your top 3 business challenges?', type:'multi-select', maxSelections:3, phase:3,
+    options:['Not enough leads','Leads but no conversions','No marketing strategy','Can\'t scale operations','Need better systems','Founder doing everything','Cash flow issues','Hiring / retention'] },
+  { id:'biggest_marketing_gap', section:'Goals', question:'Where does your marketing fall shortest today?', type:'card-select', phase:3,
+    options:['Brand awareness','Lead generation','Lead conversion','Customer retention','All of the above'] },
+  { id:'timeline_urgency', section:'Goals', question:'How quickly do you need to see results?', type:'card-select', phase:3,
+    options:['ASAP \u2014 within 30 days','1\u20133 months','3\u20136 months','Building for the long-term'] },
+  { id:'help_prompt', section:'Goals', question:'What prompted you to look for help now?', type:'textarea', phase:3,
+    placeholder:'Tell us what\u2019s driving this decision...' },
+  { id:'how_heard', section:'Goals', question:'How did you hear about us?', type:'card-select', phase:3,
+    options:['Google Search','LinkedIn','Referral','Social Media','YouTube','Podcast','Conference / Event','Other'] },
+
+  // ‚îÄ‚îÄ PHASE 4: Sales & Marketing Deep Dive ‚îÄ‚îÄ
+  { id:'marketing_team', section:'Current State', question:'Do you have a dedicated marketing team?', type:'card-select', phase:4,
+    options:['No marketing team','1 person','2\u20135 people','Marketing agency','Fractional CMO'] },
+  { id:'lead_sources_current', section:'Current State', question:'Where do your leads currently come from?', type:'multi-select', maxSelections:5, phase:4, delegatable:true,
+    options:['Google Search','Google Ads','Social Media Organic','Social Media Ads','Referrals','Word of Mouth','Trade Shows / Events','Direct Mail','Cold Outreach','Website Forms','Partnerships','Other'] },
+  { id:'monthly_ad_spend', section:'Current State', question:'What is your current monthly advertising spend (all platforms combined)?', type:'currency', placeholder:'15,000', phase:4, delegatable:true },
+  { id:'ad_account_access', section:'Current State', question:'Can you provide access to your ad accounts for auditing?', type:'card-select', phase:4,
+    options:['Yes \u2014 all platforms','Some platforms','No','We don\'t advertise'],
+    tooltip:'We run a full ad audit to find wasted spend and quick wins. View-only access is all we need.' },
+  { id:'website_monthly_traffic', section:'Current State', question:'What is your estimated monthly website traffic?', type:'card-select', phase:4, delegatable:true,
+    options:['Under 1,000','1,000\u20135,000','5,000\u201325,000','25,000\u2013100,000','100,000+','Don\'t know'] },
+
+  // ‚îÄ‚îÄ Merged: Tech + CRM + Data ‚Üí Integration Readiness ‚îÄ‚îÄ
+  { id:'tech_crm_stack', section:'Current State', question:'What systems does your business run on?', type:'multi-select', maxSelections:20, phase:4, delegatable:true,
+    options:['HubSpot','Salesforce','Pipedrive','GoHighLevel','Google Workspace','Microsoft 365','QuickBooks','Xero','Slack','Microsoft Teams','Zoom','Calendly','Mailchimp','Constant Contact','Monday.com','Zapier','None / Minimal'] },
+  { id:'automation_experience', section:'Current State', question:'Have you used any automation or AI tools before?', type:'card-select', phase:4,
+    options:['Yes \u2014 extensively','Some basic automation','No \u2014 brand new to this'] },
+
+  // ‚îÄ‚îÄ PHASE 5: Brand, Audience & Positioning ‚îÄ‚îÄ
+  { id:'brand_voice_description', section:'Brand & Audience', question:'How would you describe your brand\u2019s tone of voice?', type:'card-select', phase:5,
+    options:['Professional / Corporate','Friendly / Approachable','Bold / Disruptive','Technical / Expert','Down-to-earth / Relatable','Other'] },
+  { id:'unique_differentiator', section:'Brand & Audience', question:'What makes you different from your top competitors?', type:'textarea', phase:5,
+    placeholder:'What do customers say they chose you for? What can you do that competitors can\u2019t?' },
+  { id:'competitor_names', section:'Brand & Audience', question:'Who are your top 3\u20135 direct competitors?', type:'textarea', phase:5, delegatable:true,
+    placeholder:'Company names (include websites if you have them)' },
+  { id:'customer_success_story', section:'Brand & Audience', question:'Tell us about your best customer win', type:'textarea', phase:5,
+    placeholder:'What was their situation? What did you do? What was the result?',
+    tooltip:'This feeds directly into case study content, social proof for ads, and sales enablement materials.' },
+  { id:'brand_guidelines_exist', section:'Brand & Audience', question:'Do you have existing brand guidelines?', type:'card-select', phase:5,
+    options:['Yes \u2014 comprehensive','Partial (logo + colors)','No \u2014 we need a brand kit'] },
+  { id:'ideal_customer_title', section:'Brand & Audience', question:'What job title does your ideal buyer hold?', type:'text', phase:5,
+    placeholder:'e.g. VP of Operations, Owner, CFO, Facilities Director' },
+  { id:'geographic_scope', section:'Brand & Audience', question:'What is your geographic service area?', type:'card-select', phase:5,
+    options:['Local (single city / metro)','Regional (multi-state)','National','International'],
+    followUpType:'text', followUpPlaceholder:'Which specific markets? e.g. Dallas-Fort Worth, Southeast US', followUpId:'geographic_detail' },
+  { id:'common_objections', section:'Brand & Audience', question:'What are the top 3 objections prospects raise before buying?', type:'textarea', phase:5, delegatable:true,
+    placeholder:'e.g. "Too expensive", "We already have a vendor", "Bad timing"' },
+
+  // ‚îÄ‚îÄ Merged: Seasonality Calendar (peak + slow ‚Üí 1 dual picker) ‚îÄ‚îÄ
+  { id:'seasonality', section:'Seasonality', question:'Tag your peak and slow months', type:'seasonality-calendar', phase:5,
+    tooltip:'Click once for peak (green), click again for slow (amber), click again to clear. We use this to time your marketing spend.' },
+
+  { id:'industry_regulations', section:'Seasonality', question:'Are there industry regulations that affect your marketing?', type:'card-select', phase:5,
+    options:['Yes','No','Not sure'],
+    followUpOn:'Yes', followUpType:'textarea', followUpId:'industry_regulations_detail',
+    followUpPlaceholder:'Describe the regulations (e.g. HIPAA, licensing, advertising restrictions)' },
+
+  { id:'budget_flexibility', section:'Seasonality', question:'Is there flexibility in your marketing budget if early results are strong?', type:'card-select', phase:5,
+    options:['Yes \u2014 can increase significantly','Some room to grow','Fixed budget','Depends on ROI proof'] },
+  { id:'approval_workflow', section:'Seasonality', question:'Who needs to approve marketing content before it goes live?', type:'card-select', phase:5,
+    options:['Just me','Me + 1 other person','Committee / board','No approval needed'] }
+];
+
+// ‚îÄ‚îÄ‚îÄ STATE ‚îÄ‚îÄ‚îÄ
+let currentStep = 0;
+let answers = {};
+let idkFlags = {};
+let delegations = {}; // { questionId: { name, email } }
+let delegateOpen = {}; // which questions have delegate panel open
+let accountCreated = false;
+let seasonalityData = {}; // { Jan: 'peak', Mar: 'slow', ... }
+
+// Initialize defaults
+questions.forEach(q => {
+  if (q.type === 'slider') { answers[q.id] = q.default || 0; if (q.allowIDK) idkFlags[q.id] = false; }
+  else if (q.type === 'multi-select') answers[q.id] = [];
+  else if (q.type === 'funnel') {
+    q.stages.forEach(s => { answers[s.id] = s.default; idkFlags[s.id] = false; });
+  }
+  else if (q.type === 'seasonality-calendar') { answers[q.id] = {}; }
+  else answers[q.id] = '';
+  if (q.followUpId) answers[q.followUpId] = '';
+});
+
+// ‚îÄ‚îÄ‚îÄ SUPABASE SESSION PERSISTENCE ‚îÄ‚îÄ‚îÄ
+async function supabaseUpsert(data) {
+  // TODO: Replace with actual Supabase client call
+  // This is the integration point ‚Äî when Supabase is configured, this saves session state
+  try {
+    const badge = document.getElementById('saveBadge');
+    if (badge) { badge.className = 'save-badge saving'; badge.querySelector('.dot').style.background = ''; badge.lastChild.textContent = 'Saving...'; }
+
+    const payload = {
+      session_id: SESSION_ID,
+      current_step: currentStep,
+      answers: answers,
+      idk_flags: idkFlags,
+      delegations: delegations,
+      seasonality: seasonalityData,
+      account_created: accountCreated,
+      updated_at: new Date().toISOString(),
+      ...data
+    };
+
+    // Webhook save (works now, before Supabase is wired)
+    await fetch(WEBHOOK_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...payload, is_partial: true })
+    }).catch(() => {});
+
+    /* ‚îÄ‚îÄ SUPABASE INTEGRATION PLACEHOLDER ‚îÄ‚îÄ
+    const { data: result, error } = await supabase
+      .from('intake_sessions')
+      .upsert({
+        id: SESSION_ID,
+        email: answers.email || null,
+        name: answers.name || null,
+        phone: answers.phone || null,
+        company_name: answers.company_name || null,
+        current_step: currentStep,
+        total_steps: questions.length,
+        answers_json: answers,
+        delegations_json: delegations,
+        idk_flags_json: idkFlags,
+        seasonality_json: seasonalityData,
+        account_created: accountCreated,
+        status: currentStep >= questions.length ? 'complete' : 'in_progress',
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+    */
+
+    setTimeout(() => {
+      if (badge) { badge.className = 'save-badge'; badge.querySelector('.dot').style.background = ''; badge.lastChild.textContent = 'Saved'; }
+    }, 800);
+  } catch (e) { console.error('Save failed:', e); }
+}
+
+async function loadSession() {
+  if (!SESSION_ID) {
+    SESSION_ID = crypto.randomUUID ? crypto.randomUUID() : 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('mingma_intake_session', SESSION_ID);
+    return false;
+  }
+
+  /* ‚îÄ‚îÄ SUPABASE LOAD PLACEHOLDER ‚îÄ‚îÄ
+  const { data, error } = await supabase
+    .from('intake_sessions')
+    .select('*')
+    .eq('id', SESSION_ID)
+    .single();
+
+  if (data && data.current_step > 0) {
+    answers = data.answers_json || {};
+    delegations = data.delegations_json || {};
+    idkFlags = data.idk_flags_json || {};
+    seasonalityData = data.seasonality_json || {};
+    accountCreated = data.account_created || false;
+    resumedStep = data.current_step;
+    return true; // has saved progress
+  }
+  */
+  localStorage.setItem('mingma_intake_session', SESSION_ID);
+  return false;
+}
+
+// ‚îÄ‚îÄ‚îÄ ACCOUNT CREATION (after name + email + phone) ‚îÄ‚îÄ‚îÄ
+async function maybeCreateAccount() {
+  if (accountCreated) return;
+  if (answers.name && answers.email) {
+    accountCreated = true;
+    // Trigger account creation webhook (WF6)
+    await fetch(ACCOUNT_CREATE_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: SESSION_ID,
+        name: answers.name,
+        email: answers.email,
+        phone: answers.phone || '',
+        company_name: answers.company_name || '',
+        event: 'account_created',
+        timestamp: new Date().toISOString()
+      })
+    }).catch(() => {});
+  }
+}
+
+// ‚îÄ‚îÄ‚îÄ DELEGATION ‚îÄ‚îÄ‚îÄ
+function toggleDelegate(qId) {
+  delegateOpen[qId] = !delegateOpen[qId];
+  render(null);
+}
+
+async function sendDelegation(qId) {
+  const nameInput = document.getElementById('delName_' + qId);
+  const emailInput = document.getElementById('delEmail_' + qId);
+  if (!nameInput || !emailInput || !emailInput.value) return;
+
+  const delName = nameInput.value.trim();
+  const delEmail = emailInput.value.trim();
+  if (!delEmail) return;
+
+  delegations[qId] = { name: delName, email: delEmail, sent: true };
+
+  // Find the question text
+  let questionText = '';
+  questions.forEach(q => {
+    if (q.id === qId) questionText = q.question;
+    if (q.type === 'funnel' && q.stages) q.stages.forEach(s => { if (s.id === qId) questionText = s.label; });
+  });
+
+  // Send delegation webhook
+  await fetch(DELEGATE_WEBHOOK_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      session_id: SESSION_ID,
+      requester_name: answers.name || 'A client',
+      requester_email: answers.email || '',
+      requester_company: answers.company_name || '',
+      delegate_name: delName,
+      delegate_email: delEmail,
+      question_id: qId,
+      question_text: questionText,
+      form_url: window.location.href,
+      timestamp: new Date().toISOString()
+    })
+  }).catch(() => {});
+
+  supabaseUpsert({});
+  render(null);
+}
+
+// ‚îÄ‚îÄ‚îÄ VOICE-TO-TEXT ‚îÄ‚îÄ‚îÄ
+let voiceRecording = false;
+let recognition = null;
+
+function toggleVoice(inputId) {
+  // Placeholder: Uses Web Speech API where available
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Voice input is not supported in this browser. Try Chrome or Edge.');
+    return;
+  }
+
+  const btn = document.getElementById('voiceBtn');
+  if (voiceRecording && recognition) {
+    recognition.stop();
+    voiceRecording = false;
+    if (btn) btn.classList.remove('recording');
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  const input = document.getElementById(inputId);
+  let finalTranscript = input ? input.value : '';
+
+  recognition.onresult = function(event) {
+    let interim = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript + ' ';
+      } else {
+        interim += event.results[i][0].transcript;
+      }
+    }
+    if (input) {
+      input.value = finalTranscript + interim;
+      const q = questions[currentStep];
+      answers[q.id] = finalTranscript + interim;
+    }
+  };
+
+  recognition.onend = function() {
+    voiceRecording = false;
+    if (btn) btn.classList.remove('recording');
+  };
+
+  recognition.start();
+  voiceRecording = true;
+  if (btn) btn.classList.add('recording');
+}
+
+// ‚îÄ‚îÄ‚îÄ HELPERS ‚îÄ‚îÄ‚îÄ
+function formatCurrency(val) {
+  const num = (val+'').replace(/\D/g, '');
+  if (!num) return '';
+  return parseInt(num, 10).toLocaleString();
+}
+
+function updateSliderTrack(input, min, max) {
+  const pct = ((input.value - min) / (max - min)) * 100;
+  input.style.background = 'linear-gradient(to right, #14B8A6 0%, #14B8A6 ' + pct + '%, rgba(255,255,255,0.1) ' + pct + '%, rgba(255,255,255,0.1) 100%)';
+}
+
+function validate() {
+  const q = questions[currentStep];
+  if (q.required) {
+    const val = answers[q.id];
+    if (!val || (typeof val === 'string' && !val.trim())) return 'This field is required';
+  }
+  if (q.type === 'email' && answers[q.id]) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(answers[q.id])) return 'Please enter a valid email address';
+  }
+  return null;
+}
+
+// ‚îÄ‚îÄ‚îÄ NAVIGATION ‚îÄ‚îÄ‚îÄ
+function goNext() {
+  const err = validate();
+  if (err) {
+    const errEl = document.getElementById('validationError');
+    if (errEl) { errEl.innerHTML = ICONS.alert + ' ' + err; errEl.style.display = 'flex'; }
+    return;
+  }
+
+  // Create account after we have name + email
+  if (currentStep >= 1 && answers.name && answers.email && !accountCreated) {
+    maybeCreateAccount();
+  }
+
+  supabaseUpsert({});
+
+  if (currentStep < questions.length - 1) { currentStep++; render('right'); }
+  else { showSummary(); }
+}
+
+function goBack() {
+  if (currentStep > 0) { currentStep--; render('left'); }
+}
+
+function skipQuestion() {
+  const q = questions[currentStep];
+  if (q.required) return;
+  supabaseUpsert({});
+  if (currentStep < questions.length - 1) { currentStep++; render('right'); }
+  else { showSummary(); }
+}
+
+function selectCard(val) {
+  const q = questions[currentStep];
+  answers[q.id] = val;
+
+  // If has follow-up and selected the trigger value, re-render to show it
+  if (q.followUpOn && val === q.followUpOn) {
+    render(null);
+    return;
+  }
+  // Clear follow-up if not triggered
+  if (q.followUpId && val !== q.followUpOn) answers[q.followUpId] = '';
+
+  if (currentStep >= 1 && answers.name && answers.email && !accountCreated) maybeCreateAccount();
+  supabaseUpsert({});
+
+  if (currentStep < questions.length - 1) { currentStep++; render('right'); }
+  else { showSummary(); }
+}
+
+function toggleMulti(val) {
+  const q = questions[currentStep];
+  const max = q.maxSelections || 99;
+  let arr = answers[q.id] || [];
+  if (arr.includes(val)) arr = arr.filter(v => v !== val);
+  else if (arr.length < max) arr = [...arr, val];
+  else return;
+  answers[q.id] = arr;
+  renderMultiState();
+}
+
+function renderMultiState() {
+  const q = questions[currentStep];
+  const arr = answers[q.id] || [];
+  document.querySelectorAll('.card-option').forEach(btn => {
+    const val = btn.dataset.value;
+    if (!val) return;
+    const sel = arr.includes(val);
+    btn.classList.toggle('selected', sel);
+    const checkSpan = btn.querySelector('.ms-check');
+    if (checkSpan) checkSpan.innerHTML = sel ? ICONS.checkSmall : '';
+  });
+  const counter = document.getElementById('multiCount');
+  if (counter) {
+    const max = q.maxSelections || 99;
+    counter.textContent = arr.length + (max < 99 ? ' of ' + max : '') + ' selected';
+  }
+}
+
+function cycleSeasonality(month) {
+  const current = seasonalityData[month] || 'none';
+  if (current === 'none') seasonalityData[month] = 'peak';
+  else if (current === 'peak') seasonalityData[month] = 'slow';
+  else seasonalityData[month] = 'none';
+
+  // Sync to answers
+  answers.seasonality = { ...seasonalityData };
+
+  // Update UI
+  const btn = document.querySelector('[data-month="' + month + '"]');
+  if (btn) {
+    btn.className = 'month-btn' + (seasonalityData[month] !== 'none' ? ' ' + seasonalityData[month] : '');
+  }
+}
+
+function updateFunnelSlider(stageId, value) {
+  answers[stageId] = parseInt(value, 10);
+  const suffix = '%';
+  const valEl = document.getElementById('fval_' + stageId);
+  if (valEl) valEl.textContent = value + suffix;
+
+  // Recalculate funnel
+  const cancel = answers.lead_cancellation_rate || 0;
+  const close = answers.sales_closing_ratio || 20;
+  const rescind = answers.job_rescission_rate || 0;
+  const surviving = 100 - cancel;
+  const closed = Math.round(surviving * close / 100);
+  const final = Math.round(closed * (100 - rescind) / 100);
+
+  const resultEl = document.getElementById('funnelResult');
+  if (resultEl) resultEl.textContent = 'Of 100 leads \u2192 ' + surviving + ' engage \u2192 ' + closed + ' close \u2192 ' + final + ' stick = ' + final + '% net conversion';
+}
+
+// ‚îÄ‚îÄ‚îÄ RENDER ‚îÄ‚îÄ‚îÄ
+function render(direction) {
+  const container = document.getElementById('questionContainer');
+  const q = questions[currentStep];
+  const progress = ((currentStep + 1) / questions.length) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  document.getElementById('stepText').textContent = 'Question ' + (currentStep + 1) + ' of ' + questions.length;
+
+  container.className = 'card' + (direction === 'left' ? ' slide-in-left' : direction === 'right' ? ' slide-in-right' : '');
+
+  let html = '';
+
+  // Section label
+  if (q.section) html += '<div class="section-label">' + q.section + '</div>';
+
+  html += '<h2 class="question-title">' + q.question + '</h2>';
+
+  // Tooltip
+  if (q.tooltip) html += '<div class="info-box"><span class="info-icon">' + ICONS.info + '</span><span class="info-text">' + q.tooltip + '</span></div>';
+
+  // ‚îÄ‚îÄ INPUT TYPES ‚îÄ‚îÄ
+
+  if (['text','email','tel','url','number'].includes(q.type)) {
+    html += '<input class="text-input" type="' + (q.type === 'number' ? 'text' : q.type) + '" placeholder="' + (q.placeholder || '') + '" value="' + (answers[q.id] || '') + '" id="mainInput" autocomplete="off">';
+    html += '<div class="error" id="validationError" style="display:none"></div>';
+  }
+
+  if (q.type === 'currency') {
+    html += '<div class="currency-wrap"><span class="currency-symbol">$</span><input class="text-input" type="text" placeholder="' + (q.placeholder || '') + '" value="' + (answers[q.id] || '') + '" id="mainInput" autocomplete="off"></div>';
+    html += '<div class="error" id="validationError" style="display:none"></div>';
+  }
+
+  if (q.type === 'slider') {
+    const val = answers[q.id];
+    html += '<div class="slider-wrap"><input type="range" min="' + q.min + '" max="' + q.max + '" value="' + val + '" id="sliderInput">';
+    html += '<div class="slider-value" id="sliderValue">' + val + (q.suffix || '') + '</div>';
+    const helperText = typeof q.helper === 'function' ? q.helper(answers) : (q.helper || '');
+    html += '<div class="slider-helper" id="sliderHelper">' + helperText + '</div></div>';
+  }
+
+  if (q.type === 'textarea') {
+    html += '<div class="textarea-wrap"><textarea class="text-input" placeholder="' + (q.placeholder || '') + '" id="mainInput">' + (answers[q.id] || '') + '</textarea>';
+    html += '<button class="voice-btn" id="voiceBtn" onclick="toggleVoice(\'mainInput\')" title="Voice input">' + ICONS.mic + '</button></div>';
+    html += '<div style="color:#6B7280;font-size:12px;margin-top:8px;display:flex;justify-content:space-between"><span>Press Ctrl+Enter to continue</span><span>or use voice input</span></div>';
+  }
+
+  if (q.type === 'card-select') {
+    html += '<div class="card-grid">';
+    q.options.forEach(opt => {
+      const sel = answers[q.id] === opt ? ' selected' : '';
+      html += '<button class="card-option' + sel + '" data-value="' + opt + '" onclick="selectCard(\'' + opt.replace(/'/g, "\\'") + '\')">' + opt + '</button>';
+    });
+    html += '</div>';
+    // Follow-up
+    if (q.followUpOn && answers[q.id] === q.followUpOn && q.followUpType === 'textarea') {
+      html += '<div style="margin-top:16px;animation:fadeInUp 0.3s"><textarea class="text-input" placeholder="' + (q.followUpPlaceholder || '') + '" id="followUpInput">' + (answers[q.followUpId] || '') + '</textarea></div>';
+    } else if (q.followUpType === 'text' && answers[q.id]) {
+      html += '<div style="margin-top:16px;animation:fadeInUp 0.3s"><input class="text-input" type="text" placeholder="' + (q.followUpPlaceholder || '') + '" value="' + (answers[q.followUpId] || '') + '" id="followUpInput"></div>';
+    }
+  }
+
+  if (q.type === 'multi-select') {
+    const arr = answers[q.id] || [];
+    const max = q.maxSelections || 99;
+    html += '<div class="multi-grid">';
+    q.options.forEach(opt => {
+      const sel = arr.includes(opt) ? ' selected' : '';
+      html += '<button class="card-option' + sel + '" data-value="' + opt + '" onclick="toggleMulti(\'' + opt.replace(/'/g, "\\'") + '\')"><span class="ms-check" style="display:inline-block;width:16px;margin-right:6px;">' + (arr.includes(opt) ? ICONS.checkSmall : '') + '</span>' + opt + '</button>';
+    });
+    html += '</div>';
+    html += '<div class="multi-count" id="multiCount">' + arr.length + (max < 99 ? ' of ' + max : '') + ' selected</div>';
+  }
+
+  // ‚îÄ‚îÄ FUNNEL TYPE (merged sales metrics) ‚îÄ‚îÄ
+  if (q.type === 'funnel') {
+    q.stages.forEach((s, i) => {
+      const val = answers[s.id] || s.default;
+      html += '<div class="funnel-stage">';
+      html += '<div class="funnel-label">' + s.label + '</div>';
+      html += '<input type="range" min="' + s.min + '" max="' + s.max + '" value="' + val + '" id="fslider_' + s.id + '" oninput="updateFunnelSlider(\'' + s.id + '\',this.value);updateSliderTrack(this,' + s.min + ',' + s.max + ')">';
+      html += '<div class="slider-value" id="fval_' + s.id + '" style="font-size:22px">' + val + s.suffix + '</div>';
+      html += '</div>';
+    });
+    // Net result
+    const cancel = answers.lead_cancellation_rate || 0;
+    const close = answers.sales_closing_ratio || 20;
+    const rescind = answers.job_rescission_rate || 0;
+    const surviving = 100 - cancel;
+    const closed = Math.round(surviving * close / 100);
+    const final = Math.round(closed * (100 - rescind) / 100);
+    html += '<div class="funnel-result" id="funnelResult" style="text-align:center;color:#14B8A6;font-weight:600;padding:16px;border-radius:10px;background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.2);">Of 100 leads \u2192 ' + surviving + ' engage \u2192 ' + closed + ' close \u2192 ' + final + ' stick = ' + final + '% net conversion</div>';
+  }
+
+  // ‚îÄ‚îÄ SEASONALITY CALENDAR (merged peak+slow) ‚îÄ‚îÄ
+  if (q.type === 'seasonality-calendar') {
+    html += '<div class="month-calendar">';
+    MONTHS.forEach(m => {
+      const state = seasonalityData[m] || 'none';
+      html += '<button class="month-btn' + (state !== 'none' ? ' ' + state : '') + '" data-month="' + m + '" onclick="cycleSeasonality(\'' + m + '\')">' + m + '</button>';
+    });
+    html += '</div>';
+    html += '<div class="month-legend"><span><span class="legend-dot peak"></span>Peak</span><span><span class="legend-dot slow"></span>Slow</span><span style="color:#6B7280">Click to cycle: none \u2192 peak \u2192 slow \u2192 none</span></div>';
+  }
+
+  // ‚îÄ‚îÄ DELEGATE TOGGLE (for delegatable questions) ‚îÄ‚îÄ
+  if (q.delegatable && answers.name) {
+    const isDelegated = delegations[q.id] && delegations[q.id].sent;
+    if (isDelegated) {
+      html += '<div class="delegate-panel" style="border-color:rgba(20,184,166,0.3);background:rgba(20,184,166,0.06)"><h4 style="color:#14B8A6">\u2713 Delegated to ' + delegations[q.id].name + ' (' + delegations[q.id].email + ')</h4><div class="delegate-note">They\u2019ll receive an email with instructions. You can skip this question or answer it yourself.</div></div>';
+    } else {
+      html += '<div class="delegate-toggle' + (delegateOpen[q.id] ? ' active' : '') + '" onclick="toggleDelegate(\'' + q.id + '\')">' + ICONS.delegate + '<span class="delegate-toggle-label">Someone else on my team knows this better</span></div>';
+
+      if (delegateOpen[q.id]) {
+        html += '<div class="delegate-panel"><h4>Send this question to a team member</h4>';
+        html += '<div class="delegate-row"><input type="text" id="delName_' + q.id + '" placeholder="Their name" value="' + ((delegations[q.id] && delegations[q.id].name) || '') + '"><input type="email" id="delEmail_' + q.id + '" placeholder="Their email" value="' + ((delegations[q.id] && delegations[q.id].email) || '') + '"></div>';
+        html += '<button class="btn-next" style="max-width:200px;font-size:14px;padding:10px 16px;margin-top:4px" onclick="sendDelegation(\'' + q.id + '\')">Send Request</button>';
+        html += '<div class="delegate-note" style="margin-top:10px">They\u2019ll receive an email: <em>"ATTN \u2014 ' + (answers.name || 'Your colleague') + ' requests [this info] to help build their strategic roadmap"</em></div>';
+        html += '</div>';
+      }
+    }
+  }
+
+  // ‚îÄ‚îÄ NAV BUTTONS ‚îÄ‚îÄ
+  const isCardSelect = q.type === 'card-select' && !q.followUpOn;
+  const hasFollowUpShowing = q.followUpOn && answers[q.id] === q.followUpOn;
+  const needsNav = q.type !== 'card-select' || hasFollowUpShowing || q.followUpType === 'text';
+
+  if (needsNav) {
+    html += '<div class="nav">';
+    html += '<button class="btn-back" onclick="goBack()"' + (currentStep === 0 ? ' disabled' : '') + '>' + ICONS.chevronLeft + ' Back</button>';
+    if (!q.required) html += '<button class="btn-skip" onclick="skipQuestion()">Skip</button>';
+    const btnLabel = currentStep === questions.length - 1 ? 'Review' : 'Next';
+    html += '<button class="btn-next" onclick="goNext()">' + btnLabel + ' ' + ICONS.chevronRight + '</button>';
+    html += '</div>';
+    if (currentStep < questions.length - 1) html += '<div class="save-note">Your progress is saved automatically \u2014 come back anytime</div>';
+  } else {
+    // Card-select with back + skip
+    html += '<div class="nav" style="margin-top:24px">';
+    if (currentStep > 0) html += '<button class="btn-back" onclick="goBack()">' + ICONS.chevronLeft + ' Back</button>';
+    if (!q.required) html += '<button class="btn-skip" onclick="skipQuestion()">Skip</button>';
+    html += '<div style="flex:1"></div></div>';
+  }
+
+  container.innerHTML = html;
+
+  // ‚îÄ‚îÄ POST-RENDER BINDINGS ‚îÄ‚îÄ
+  const mainInput = document.getElementById('mainInput');
+  if (mainInput) {
+    setTimeout(() => mainInput.focus(), 100);
+    if (q.type === 'currency') {
+      mainInput.addEventListener('input', function() {
+        answers[q.id] = formatCurrency(this.value);
+        this.value = answers[q.id];
+      });
+    } else if (q.type === 'textarea') {
+      mainInput.addEventListener('input', function() { answers[q.id] = this.value; });
+      mainInput.addEventListener('keydown', function(e) { if (e.key === 'Enter' && e.ctrlKey) goNext(); });
+    } else {
+      mainInput.addEventListener('input', function() {
+        answers[q.id] = this.value;
+        const errEl = document.getElementById('validationError');
+        if (errEl) errEl.style.display = 'none';
+      });
+    }
+    if (q.type !== 'textarea') {
+      mainInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); goNext(); } });
+    }
+  }
+
+  // Follow-up input
+  const followUpInput = document.getElementById('followUpInput');
+  if (followUpInput) {
+    setTimeout(() => followUpInput.focus(), 200);
+    followUpInput.addEventListener('input', function() { answers[q.followUpId] = this.value; });
+    if (q.followUpType === 'text') {
+      followUpInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); goNext(); } });
+    } else {
+      followUpInput.addEventListener('keydown', function(e) { if (e.key === 'Enter' && e.ctrlKey) goNext(); });
+    }
+  }
+
+  // Slider
+  const slider = document.getElementById('sliderInput');
+  if (slider) {
+    updateSliderTrack(slider, q.min, q.max);
+    slider.addEventListener('input', function() {
+      answers[q.id] = parseInt(this.value, 10);
+      document.getElementById('sliderValue').textContent = this.value + (q.suffix || '');
+      updateSliderTrack(this, q.min, q.max);
+      if (typeof q.helper === 'function') document.getElementById('sliderHelper').textContent = q.helper(answers);
+    });
+    slider.addEventListener('keydown', function(e) { if (e.key === 'Enter') goNext(); });
+  }
+
+  // Funnel sliders
+  if (q.type === 'funnel') {
+    q.stages.forEach(s => {
+      const fs = document.getElementById('fslider_' + s.id);
+      if (fs) updateSliderTrack(fs, s.min, s.max);
+    });
+  }
+}
+
+// ‚îÄ‚îÄ‚îÄ SUMMARY ‚îÄ‚îÄ
+function showSummary() {
+  const container = document.getElementById('questionContainer');
+  container.style.maxWidth = '800px';
+  container.className = 'card slide-in-right';
+  document.getElementById('stepText').textContent = 'Review & Submit';
+  document.getElementById('progressFill').style.width = '100%';
+
+  const sections = {};
+  questions.forEach(q => {
+    const s = q.section || 'Other';
+    if (!sections[s]) sections[s] = [];
+    sections[s].push(q);
+  });
+
+  let html = '<h2 class="question-title">Review Your Information</h2>';
+
+  Object.keys(sections).forEach(name => {
+    html += '<div class="summary-section"><div class="summary-section-title">' + name + '</div><div class="summary-grid">';
+    sections[name].forEach(q => {
+      let val, display;
+      if (q.type === 'funnel') {
+        val = q.stages.map(s => s.label.split('?')[0].trim() + ': ' + (answers[s.id] || s.default) + '%').join(', ');
+        display = val;
+      } else if (q.type === 'seasonality-calendar') {
+        const peaks = MONTHS.filter(m => seasonalityData[m] === 'peak');
+        const slows = MONTHS.filter(m => seasonalityData[m] === 'slow');
+        display = 'Peak: ' + (peaks.join(', ') || 'none') + ' | Slow: ' + (slows.join(', ') || 'none');
+      } else {
+        val = Array.isArray(answers[q.id]) ? answers[q.id].join(', ') : answers[q.id];
+        display = val || '\u2014';
+        if (q.type === 'currency' && val) display = '$' + val;
+        if (q.suffix && typeof answers[q.id] === 'number') display = answers[q.id] + q.suffix;
+      }
+      // Follow-up
+      if (q.followUpId && answers[q.followUpId]) display += ' \u2014 ' + answers[q.followUpId];
+
+      html += '<div class="summary-item"><div class="summary-label">' + q.question + '</div><div class="summary-value">' + display + '</div>';
+      if (delegations[q.id] && delegations[q.id].sent) {
+        html += '<div class="summary-delegated">\u2192 Delegated to ' + delegations[q.id].name + '</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  html += '<div class="nav">';
+  html += '<button class="btn-back" onclick="currentStep=questions.length-1;document.getElementById(\'questionContainer\').style.maxWidth=\'680px\';render(\'left\');">' + ICONS.chevronLeft + ' Back</button>';
+  html += '<button class="btn-next" onclick="submitFinal()">Submit</button>';
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showSuccess() {
+  document.getElementById('stepCounter').style.display = 'none';
+  document.getElementById('progressFill').style.width = '100%';
+  const container = document.getElementById('questionContainer');
+  container.style.maxWidth = '500px';
+  container.className = 'card';
+  container.style.textAlign = 'center';
+  container.style.border = 'none';
+  container.style.background = 'transparent';
+  container.style.boxShadow = 'none';
+  container.innerHTML = '<div class="success-icon">' + ICONS.check + '</div>' +
+    '<h2 style="font-size:32px;font-weight:600;margin-bottom:12px;">Thank you!</h2>' +
+    '<p style="color:#9CA3AF;font-size:16px;margin-bottom:16px;">We\u2019re building your go-to-market strategy now. Expect to hear from us within 24 hours.</p>' +
+    (Object.keys(delegations).length > 0 ? '<p style="color:#A78BFA;font-size:14px;margin-bottom:16px;">We\u2019ve sent ' + Object.keys(delegations).filter(k => delegations[k].sent).length + ' delegation request(s) to your team members.</p>' : '') +
+    '<p style="color:#6B7280;font-size:13px;">Session: ' + SESSION_ID + '</p>';
+}
+
+function submitFinal() {
+  const btn = document.querySelector('.btn-next');
+  if (btn) { btn.textContent = 'Submitting...'; btn.style.opacity = '0.7'; }
+
+  fetch(WEBHOOK_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ...answers,
+      seasonality: seasonalityData,
+      idk_flags: idkFlags,
+      delegations: delegations,
+      session_id: SESSION_ID,
+      current_step: questions.length,
+      total_steps: questions.length,
+      is_partial: false,
+      form_type: 'unified_intake',
+      timestamp: new Date().toISOString()
+    })
+  }).then(() => showSuccess()).catch(() => showSuccess());
+}
+
+// ‚îÄ‚îÄ‚îÄ INIT ‚îÄ‚îÄ‚îÄ
+async function init() {
+  const hasSession = await loadSession();
+
+  if (hasSession && resumedStep > 0) {
+    // Show resume banner
+    document.getElementById('resumeBanner').innerHTML = '<div class="resume-banner"><p>Welcome back! You left off at question ' + (resumedStep + 1) + ' of ' + questions.length + '.</p><button onclick="currentStep=' + resumedStep + ';document.getElementById(\'resumeBanner\').innerHTML=\'\';render(\'right\')">Resume where I left off</button><button class="btn-restart" onclick="currentStep=0;document.getElementById(\'resumeBanner\').innerHTML=\'\';render(\'right\')">Start over</button></div>';
+  }
+
+  render('right');
+}
+
+init();
+</script>
+</body>
+</html>
