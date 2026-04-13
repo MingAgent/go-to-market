@@ -90,7 +90,7 @@ function buildPhrases(firstName) {
     { text: 'Welcome to GTM Engine.' },
     { text: 'My name is Echo.', showOrb: true },
     { text: 'Can I have your full name?', input: 'name', highlight: 'name-input' },
-    { text: `${fn}, I'm glad you're here —\nyou're looking for a smarter way\nto run sales and marketing\nwithout adding headcount.` },
+    { text: `${fn}, I'm glad you're here.\nSeems like you're looking to experience how\nAI-enhanced business systems\ncan level-up your organization\nand expand your AI footprint.` },
     { text: "You're in the right place." },
     { text: 'Let me show you how.', begin: true, highlight: 'begin-btn' },
 
