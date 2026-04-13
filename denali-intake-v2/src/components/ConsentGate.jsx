@@ -7,7 +7,7 @@ export default function ConsentGate({ onAccept, onDecline }) {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-6"
+      className="min-h-screen flex flex-col items-center justify-center px-8"
       style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
     >
       {/* Shield icon */}
@@ -61,7 +61,7 @@ export default function ConsentGate({ onAccept, onDecline }) {
             <span style={{ color: CYAN }}>›</span>
             <span>
               <strong className="text-gray-400">Consent to Contact:</strong> You consent to receive
-              communications from Denali / Mingma Inc via email, SMS, and voice at the contact
+              communications from GTM Engine / Mingma Inc via email, SMS, and voice at the contact
               information you provide during this intake.
             </span>
           </li>
@@ -69,7 +69,7 @@ export default function ConsentGate({ onAccept, onDecline }) {
             <span style={{ color: CYAN }}>›</span>
             <span>
               <strong className="text-gray-400">A2P Messaging Authorization:</strong> You authorize
-              Denali to send application-to-person (A2P) messages related to your go-to-market
+              GTM Engine to send application-to-person (A2P) messages related to your go-to-market
               plan, including status updates, follow-ups, and deliverables.
             </span>
           </li>
@@ -112,7 +112,7 @@ export default function ConsentGate({ onAccept, onDecline }) {
             <p>
               By providing your phone number, you confirm that you are the subscriber or authorized
               user of the number provided and consent to receive autodialed and/or pre-recorded
-              messages from Denali / Mingma Inc.
+              messages from GTM Engine / Mingma Inc.
             </p>
             <p>
               For more information, see our Privacy Policy and Terms of Service at mingma.io.
@@ -125,10 +125,10 @@ export default function ConsentGate({ onAccept, onDecline }) {
       <div className="flex gap-6 fade-in-slow">
         <button
           onClick={onDecline}
-          className="px-8 py-3 rounded-full text-sm font-mono transition-all duration-300"
+          className="px-12 py-5 rounded-full text-sm font-mono transition-all duration-300"
           style={{
             color: '#666',
-            border: '1.5px solid #333',
+            border: '2.5px solid #444',
             background: 'transparent',
           }}
         >
@@ -136,11 +136,11 @@ export default function ConsentGate({ onAccept, onDecline }) {
         </button>
         <button
           onClick={onAccept}
-          className="px-8 py-3 rounded-full text-sm font-mono transition-all duration-300 hover:scale-105"
+          className="px-12 py-5 rounded-full text-sm font-mono transition-all duration-300 hover:scale-105"
           style={{
             color: '#fff',
             background: '#0a1929',
-            border: `1.5px solid ${CYAN}`,
+            border: `2.5px solid ${CYAN}`,
             boxShadow: `0 0 20px rgba(0, 180, 230, 0.2)`,
           }}
         >

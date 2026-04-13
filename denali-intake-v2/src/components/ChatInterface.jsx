@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import VoiceToggle from './VoiceToggle';
+import Echo1Logo from './Echo1Logo';
 import { supabase } from '../lib/supabase';
 
 // ── Colors ──
@@ -141,8 +142,9 @@ export default function ChatInterface({ squadId, sessionId, textProxyUrl, resume
   const greetedRef = useRef(false);
   useEffect(() => {
     if (resumeParams || greetedRef.current) return;
-    greetedRef.current = true;
     const timer = setTimeout(() => {
+      if (greetedRef.current) return;
+      greetedRef.current = true;
       addAgentMessage(
         "Hi, I'm Echo — your intake guide. I'll walk you through 10 short phases to build your GTM blueprint. I may ask for links, documents, or the name and email of someone who can provide key details. How much time do you have right now?"
       );
@@ -367,23 +369,24 @@ export default function ChatInterface({ squadId, sessionId, textProxyUrl, resume
               />
             </div>
 
-            {/* echo branding with rabbit icon */}
-            <div
-              className="mt-3 flex items-center gap-2 flex-shrink-0"
+            {/* echo branding */}
+            <p
+              className="mt-3 text-xs tracking-[0.4em] uppercase font-mono flex-shrink-0"
+              style={{ color: `${CYAN}50` }}
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              echo
+            </p>
+
+            {/* DENALI logo + rabbit */}
+            <div className="mt-2 flex items-center gap-3 flex-shrink-0">
+              <svg className="w-5 h-5 rabbit-glow" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M13 16a3 3 0 0 1 2.24 5" />
                 <path d="M18 12h.01" />
                 <path d="M18 21h-8a4 4 0 0 1-4-4 7 7 0 0 1 7-7h.2L9.6 6.4a1 1 0 1 1 2.8-2.8L15.8 7h.2c3.3 0 6 2.7 6 6v1a2 2 0 0 1-2 2h-1a3 3 0 0 0-3 3" />
                 <path d="M20 8.54V4a2 2 0 1 0-4 0v3" />
                 <path d="M7.612 12.524a3 3 0 1 0-1.6 4.3" />
               </svg>
-              <p
-                className="text-xs tracking-[0.4em] uppercase font-mono"
-                style={{ color: `${CYAN}50` }}
-              >
-                echo
-              </p>
+              <Echo1Logo size="sm" />
             </div>
 
             {/* ── Conversation history — persistent messages ── */}

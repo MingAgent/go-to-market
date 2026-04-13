@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
 import TypewriterIntro from './components/TypewriterIntro';
-import ConsentGate from './components/ConsentGate';
 import ChatInterface from './components/ChatInterface';
 import { supabase } from './lib/supabase';
 
@@ -64,19 +63,9 @@ export default function App() {
     );
   }
 
-  // ── Intro screen (skip if resuming) ──
+  // ── Intro screen (skip if resuming) — consent is embedded in TypewriterIntro ──
   if (screen === 'intro' && !resumeToken) {
-    return <TypewriterIntro onComplete={() => setScreen('consent')} />;
-  }
-
-  // ── Consent gate — A2P / legal authorization ──
-  if (screen === 'consent') {
-    return (
-      <ConsentGate
-        onAccept={() => setScreen('agent')}
-        onDecline={() => setScreen('intro')}
-      />
-    );
+    return <TypewriterIntro onComplete={() => setScreen('agent')} />;
   }
 
   // ── Agent screen — full viewport, no card ──
