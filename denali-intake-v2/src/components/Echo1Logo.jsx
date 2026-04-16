@@ -1,8 +1,12 @@
 /**
- * Echo1 Labs logo — ECHO in cyan, superscript 1 in white, LABS in white
- * Centered layout with all elements balanced.
+ * Echo1 Labs logo — renders the REAL SVG brand assets.
+ *
+ * Variants:
+ *   "thumbnail" (default for lg) — full lockup with tagline
+ *   "logo" (default for sm/md)   — horizontal wordmark
+ *   "favicon"                     — icon-only mark
  */
-export default function Echo1Logo({ size = 'lg' }) {
+export default function Echo1Logo({ size = 'lg', variant }) {
   const sizes = {
     sm: { maxW: 120 },
     md: { maxW: 170 },
@@ -10,50 +14,20 @@ export default function Echo1Logo({ size = 'lg' }) {
   };
   const s = sizes[size] || sizes.lg;
 
+  const v = variant || (size === 'lg' ? 'thumbnail' : 'logo');
+
+  const srcMap = {
+    thumbnail: '/echo1-thumbnail.svg',
+    logo: '/echo1-logo.svg',
+    favicon: '/echo1-favicon.svg',
+  };
+
   return (
-    <svg
-      viewBox="0 -6 275 64"
-      xmlns="http://www.w3.org/2000/svg"
+    <img
+      src={srcMap[v] || srcMap.logo}
+      alt="Echo1 Labs"
       style={{ width: '100%', height: 'auto', maxWidth: s.maxW }}
-    >
-      {/* ECHO — cyan */}
-      <text
-        x="0"
-        y="44"
-        fontFamily="'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
-        fontWeight="600"
-        fontSize="50"
-        letterSpacing="0.02em"
-        fill="#00b4e6"
-      >
-        ECHO
-      </text>
-
-      {/* Superscript 1 — white, larger */}
-      <text
-        x="146"
-        y="16"
-        fontFamily="'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
-        fontWeight="500"
-        fontSize="28"
-        fill="#ffffff"
-        opacity="0.9"
-      >
-        1
-      </text>
-
-      {/* LABS — white, baseline-aligned with ECHO */}
-      <text
-        x="163"
-        y="44"
-        fontFamily="'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
-        fontWeight="500"
-        fontSize="24"
-        letterSpacing="0.08em"
-        fill="#ffffff"
-      >
-        LABS
-      </text>
-    </svg>
+      draggable={false}
+    />
   );
 }
