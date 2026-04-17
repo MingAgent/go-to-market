@@ -150,5 +150,14 @@ export function useVapi() {
     addLog(`Edited response: "${newText.slice(0, 40)}..."`, 'event');
   }, [addLog]);
 
-  return { start, stop, callActive, orbState, setOrbState, caption, transcript, editTranscript, logs, addLog };
+  const addTranscriptEntry = useCallback((role, text) => {
+    setTranscript((prev) => [...prev, {
+      id: Date.now() + Math.random(),
+      role,
+      text,
+      ts: new Date().toLocaleTimeString('en-US', { hour12: false }),
+    }]);
+  }, []);
+
+  return { start, stop, callActive, orbState, setOrbState, caption, transcript, editTranscript, addTranscriptEntry, logs, addLog };
 }

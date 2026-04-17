@@ -53,7 +53,7 @@ export default function OrbLayout({
   onSkip,
   currentQuestion = '',
 }) {
-  const { start, stop, callActive, orbState, setOrbState, caption, transcript, editTranscript, logs, addLog } = vapi;
+  const { start, stop, callActive, orbState, setOrbState, caption, transcript, editTranscript, addTranscriptEntry, logs, addLog } = vapi;
 
   const [muted, setMuted] = useState(false);
   const [textInput, setTextInput] = useState('');
@@ -98,16 +98,40 @@ export default function OrbLayout({
     return () => document.removeEventListener('keydown', handler);
   }, []);
 
-  // Auto-start voice on mount — Echo greets the user
+  // Welcome sequence + auto-start voice
   useEffect(() => {
     if (hasAutoStarted.current) return;
     hasAutoStarted.current = true;
-    const timer = setTimeout(() => {
+
+    const welcomeLines = [
+      `Hello ${firstName || 'there'}, let\u2019s begin by tapping the orb to say your answer, or type your answer below.`,
+      'You can switch between either, but your choice will help me understand your preferences for the future.',
+      'For now, we will be focusing on identity.',
+      'What\u2019s the name of your company, and what do you do?',
+    ];
+
+    // Fade in each line 500ms apart
+    const timers = welcomeLines.map((line, i) =>
+      setTimeout(() => {
+        addTranscriptEntry('assistant', line);
+        // Set the last line as the active caption/question
+        if (i === welcomeLines.length - 1) {
+          setDisplayedCaption(line);
+        }
+      }, i * 500)
+    );
+
+    // Auto-start Vapi after welcome sequence completes
+    const vapiTimer = setTimeout(() => {
       if (!callActive) {
         start(currentPhase);
       }
-    }, 800);
-    return () => clearTimeout(timer);
+    }, welcomeLines.length * 500 + 500); // 2500ms total
+
+    return () => {
+      timers.forEach(clearTimeout);
+      clearTimeout(vapiTimer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
