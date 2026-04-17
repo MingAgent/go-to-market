@@ -612,7 +612,8 @@ body {
   direction: rtl;
   width: 4px;
   height: 100px;
-  background: transparent;
+  background: rgba(0, 229, 255, 0.25);
+  border-radius: 2px;
   cursor: pointer;
 }
 /* Webkit track */
@@ -667,7 +668,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1.5px solid transparent;
+  border: 1.5px solid rgba(61, 216, 224, 0.15);
   pointer-events: none;
   transition: border-color 0.6s ease, box-shadow 0.6s ease;
 }
