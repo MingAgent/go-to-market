@@ -31,7 +31,7 @@ export default function Onboarding({ onComplete }) {
   const [showSpeakerIcon, setShowSpeakerIcon] = useState(false);
   const [declined, setDeclined] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [showSkipIntro, setShowSkipIntro] = useState(false);
+  const [showSkipIntro, setShowSkipIntro] = useState(true);
   const [showSoundOn, setShowSoundOn] = useState(false);
   const [skippedIntro, setSkippedIntro] = useState(false);
 
@@ -68,12 +68,11 @@ export default function Onboarding({ onComplete }) {
     setShowSpeakerIcon(false);
     setShowSpeakerHighlight(false);
     setShowSoundOn(false);
+    setShowNameInput(false);
+    setShowConsent(false);
     clearLines();
-    // Show name input + consent together
-    setShowNameInput(true);
-    setShowConsent(true);
-    setTimeout(() => nameRef.current?.focus(), 100);
-  }, [clearLines]);
+    onComplete(nameRef.current?.value?.trim() || 'there');
+  }, [clearLines, onComplete]);
 
   // Click to skip
   useEffect(() => {
@@ -94,9 +93,6 @@ export default function Onboarding({ onComplete }) {
       if (skip()) return;
       await pause(PAUSE_STEP);
 
-      // Show "Skip intro" button after ~2s of typewriter
-      setTimeout(() => { if (!cancelled) setShowSkipIntro(true); }, 2000);
-
       await typeLine('I am your strategic intake concierge. Over the next thirty minutes, I will help you build the foundation for a go-to-market roadmap built specifically for your business.');
       if (skip()) return;
       await pause(PAUSE_STEP);
@@ -107,7 +103,6 @@ export default function Onboarding({ onComplete }) {
       if (skip()) return;
       await pause(PAUSE_SHORT);
 
-      setShowSkipIntro(false);
       if (!skipIntroRef.current) {
         setShowNameInput(true);
         setTimeout(() => nameRef.current?.focus(), 100);
@@ -219,8 +214,11 @@ export default function Onboarding({ onComplete }) {
         return;
       }
 
-      // Step 8 — Transition
+      // Step 8 — Sound-on reminder + Transition
       clearLines();
+      setShowConsent(false);
+      await typeLine('Sound on recommended 🔊');
+      await pause(1500);
       onComplete(firstName);
     }
 
@@ -309,8 +307,8 @@ export default function Onboarding({ onComplete }) {
       )}
 
       {/* Skip intro button — fades in after ~2s, hidden once name input shows */}
-      {showSkipIntro && !showNameInput && !showConsent && (
-        <button type="button" className="skip-intro-btn" onClick={handleSkipIntro}>
+      {showSkipIntro && (
+        <button type="button" className={`skip-intro-btn ${(showNameInput || showConsent || showOrbPreview) ? 'skip-intro-btn--bottom' : ''}`} onClick={handleSkipIntro}>
           Skip intro
         </button>
       )}

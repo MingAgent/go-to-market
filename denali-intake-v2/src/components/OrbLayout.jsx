@@ -93,6 +93,16 @@ export default function OrbLayout({
     return () => document.removeEventListener('keydown', handler);
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!callActive) {
+        start(currentPhase);
+      }
+    }, 1200);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleOrbClick = useCallback(() => {
     if (callActive) {
       stop();
