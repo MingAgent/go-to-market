@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd denali-intake-v2 && npm install && npm run build",
+  "outputDirectory": "denali-intake-v2/dist",
+  "framework": "vite"
+}
