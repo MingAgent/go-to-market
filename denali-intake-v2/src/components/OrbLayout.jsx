@@ -68,6 +68,7 @@ export default function OrbLayout({
   const captionQueueRef = useRef([]);
   const captionTimerRef = useRef(null);
   const fileInputRef = useRef(null);
+  const hasAutoStarted = useRef(false);
 
   const energy = ORB_ENERGY[orbState] || 0.15;
   const label = ORB_LABELS[orbState] || '';
@@ -93,12 +94,15 @@ export default function OrbLayout({
     return () => document.removeEventListener('keydown', handler);
   }, []);
 
+  // Auto-start voice on mount — Echo greets the user
   useEffect(() => {
+    if (hasAutoStarted.current) return;
+    hasAutoStarted.current = true;
     const timer = setTimeout(() => {
       if (!callActive) {
         start(currentPhase);
       }
-    }, 1200);
+    }, 800);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -289,23 +293,6 @@ export default function OrbLayout({
         {/* ── Orb Card (glassmorphism wrapper) ── */}
         <div className="orb-card">
 
-          {/* Question preview — TOP of card, persistent reference */}
-          {currentQuestion && (
-            <div className="question-preview">{currentQuestion}</div>
-          )}
-
-          {/* Echo caption — paced sentence display */}
-          {displayedCaption && (
-            <div className="echo-caption">{displayedCaption}</div>
-          )}
-
-          {/* Subtitle — only when idle and no active question */}
-          {!currentQuestion && orbState === 'idle' && (
-            <div className="echo-subtitle">
-              Tell Echo about your business in your own words
-            </div>
-          )}
-
           {/* Orb area with peripheral controls */}
           <div className="orb-zone">
 
@@ -377,6 +364,11 @@ export default function OrbLayout({
           {/* CTA label */}
           {label && <div className={`orb-label ${orbState}`}>{label}</div>}
 
+          {/* Echo caption / subtitles — below "Tap to speak", cyan 20px */}
+          {displayedCaption && (
+            <div className="echo-caption">{displayedCaption}</div>
+          )}
+
           {/* Text input with file upload */}
           <div className="text-input-wrap">
             <input
@@ -421,10 +413,13 @@ export default function OrbLayout({
 
           <p className="input-hint">Press Enter to submit &middot; or speak your answer</p>
 
-          {/* Back / Skip navigation */}
+          {/* Back / Pause / Skip navigation */}
           <div className="nav-row">
             <button type="button" className="nav-row__btn" onClick={onBack}>
               <span className="arrow">&lsaquo;</span> Back
+            </button>
+            <button type="button" className="nav-row__pause" onClick={onPause} title="Pause">
+              &#9208;
             </button>
             <button type="button" className="nav-row__btn" onClick={onSkip}>
               Skip <span className="arrow">&rsaquo;</span>
@@ -443,6 +438,17 @@ export default function OrbLayout({
               ))}
             </div>
           )}
+
+          {/* Card actions — Review + Pause, inside card with spacing */}
+          <div className="card-actions">
+            <button type="button" className="card-actions__btn" onClick={onReviewAnswers}>
+              Review my answers
+            </button>
+            <button type="button" className="card-actions__btn" onClick={onPause}>
+              Pause &amp; save
+            </button>
+          </div>
+
         </div>
         {/* end .orb-card */}
 
@@ -459,17 +465,6 @@ export default function OrbLayout({
         )}
       </div>
       {/* end .orb-scrollable */}
-
-      {/* ── Footer: actions ── */}
-      <div className="orb-footer">
-        <button type="button" className="orb-footer__text-btn" onClick={onReviewAnswers}>
-          Review my answers
-        </button>
-        <button type="button" className="orb-footer__text-btn" onClick={onPause}>
-          Pause &amp; save
-        </button>
-        <span className="orb-footer__copyright">&copy; 2026 Mingma Inc</span>
-      </div>
 
     </div>
   );
