@@ -1,12 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Onboarding from './components/Onboarding';
 import OrbLayout from './components/OrbLayout';
 import { useVapi } from './hooks/useVapi';
 import './App.css';
 
 export default function App() {
-  const [screen, setScreen] = useState('onboarding'); // 'onboarding' | 'orb'
-  const [firstName, setFirstName] = useState('');
+  // ?skip=1 bypasses onboarding entirely
+  const params = new URLSearchParams(window.location.search);
+  const skipOnboarding = params.get('skip') === '1';
+
+  const [screen, setScreen] = useState(skipOnboarding ? 'orb' : 'onboarding');
+  const [firstName, setFirstName] = useState(skipOnboarding ? 'there' : '');
   const [currentPhase, setCurrentPhase] = useState(1);
   const [fadeClass, setFadeClass] = useState('');
 
