@@ -12,6 +12,7 @@ export function useVapi() {
   const [orbState, setOrbState] = useState('idle');
   const [caption, setCaption] = useState('');
   const [logs, setLogs] = useState([]);
+  const [transcript, setTranscript] = useState([]);
 
   const addLog = useCallback((msg, type = '') => {
     const ts = new Date().toLocaleTimeString('en-US', { hour12: false });
@@ -88,6 +89,13 @@ export function useVapi() {
         const who = msg.role === 'assistant' ? 'Echo' : 'You';
         addLog(`[${who}] ${msg.transcript}`, msg.role === 'assistant' ? 'speech' : 'transcript');
         if (msg.role === 'assistant') setCaption(msg.transcript);
+        // Add to structured transcript
+        setTranscript((prev) => [...prev, {
+          id: Date.now(),
+          role: msg.role,
+          text: msg.transcript,
+          ts: new Date().toLocaleTimeString('en-US', { hour12: false }),
+        }]);
       }
     };
     const onError = (err) => {
@@ -135,5 +143,12 @@ export function useVapi() {
     }
   }, [addLog]);
 
-  return { start, stop, callActive, orbState, setOrbState, caption, logs, addLog };
+  const editTranscript = useCallback((id, newText) => {
+    setTranscript((prev) => prev.map((e) =>
+      e.id === id ? { ...e, text: newText, edited: true } : e
+    ));
+    addLog(`Edited response: "${newText.slice(0, 40)}..."`, 'event');
+  }, [addLog]);
+
+  return { start, stop, callActive, orbState, setOrbState, caption, transcript, editTranscript, logs, addLog };
 }

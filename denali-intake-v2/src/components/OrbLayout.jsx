@@ -53,10 +53,12 @@ export default function OrbLayout({
   onSkip,
   currentQuestion = '',
 }) {
-  const { start, stop, callActive, orbState, setOrbState, caption, logs, addLog } = vapi;
+  const { start, stop, callActive, orbState, setOrbState, caption, transcript, editTranscript, logs, addLog } = vapi;
 
   const [muted, setMuted] = useState(false);
   const [textInput, setTextInput] = useState('');
+  const [hoveredId, setHoveredId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const [showLog, setShowLog] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [speedOpen, setSpeedOpen] = useState(false);
@@ -69,6 +71,8 @@ export default function OrbLayout({
   const captionTimerRef = useRef(null);
   const fileInputRef = useRef(null);
   const hasAutoStarted = useRef(false);
+  const transcriptEndRef = useRef(null);
+  const longPressRef = useRef(null);
 
   const energy = ORB_ENERGY[orbState] || 0.15;
   const label = ORB_LABELS[orbState] || '';
@@ -257,6 +261,25 @@ export default function OrbLayout({
     }
   }, [orbState]);
 
+  // Auto-scroll transcript to bottom on new entries
+  useEffect(() => {
+    transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [transcript]);
+
+  // Save edited transcript entry
+  const saveEdit = useCallback((id, newText) => {
+    if (newText.trim()) editTranscript(id, newText.trim());
+    setEditingId(null);
+  }, [editTranscript]);
+
+  // Long-press handlers for mobile edit
+  const handleTouchStart = useCallback((id) => {
+    longPressRef.current = setTimeout(() => setHoveredId(id), 500);
+  }, []);
+  const handleTouchEnd = useCallback(() => {
+    if (longPressRef.current) clearTimeout(longPressRef.current);
+  }, []);
+
   return (
     <div className="orb-layout">
 
@@ -426,27 +449,53 @@ export default function OrbLayout({
             </button>
           </div>
 
-          {/* Answered so far */}
-          {answers.length > 0 && (
-            <div className="answers-section">
-              <h4>Your answers</h4>
-              {answers.map((a, i) => (
-                <div key={i} className="answer-item">
-                  <span className="answer-label">{a.label}</span>
-                  {a.value}
+          {/* Live conversation transcript */}
+          <div className="transcript-panel">
+            {transcript.length === 0 ? (
+              <p className="transcript-empty">Your conversation will appear here...</p>
+            ) : (
+              transcript.map((entry) => (
+                <div
+                  key={entry.id}
+                  className={`transcript-entry transcript-entry--${entry.role}${editingId === entry.id ? ' editing' : ''}`}
+                  onMouseEnter={() => entry.role === 'user' && setHoveredId(entry.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  onTouchStart={() => entry.role === 'user' && handleTouchStart(entry.id)}
+                  onTouchEnd={handleTouchEnd}
+                  onTouchMove={handleTouchEnd}
+                >
+                  <span className="transcript-role">
+                    {entry.role === 'assistant' ? 'Echo' : 'You'}
+                    <span className="transcript-ts">{entry.ts}</span>
+                    {entry.edited && <span className="transcript-edited">(edited)</span>}
+                  </span>
+                  {editingId === entry.id ? (
+                    <textarea
+                      className="transcript-edit"
+                      defaultValue={entry.text}
+                      onBlur={(e) => saveEdit(entry.id, e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveEdit(entry.id, e.target.value); } }}
+                      autoFocus
+                    />
+                  ) : (
+                    <p className="transcript-text">{entry.text}</p>
+                  )}
+                  {entry.role === 'user' && hoveredId === entry.id && editingId !== entry.id && (
+                    <button
+                      className="transcript-edit-btn"
+                      onClick={() => setEditingId(entry.id)}
+                      title="Edit response"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
-
-          {/* Card actions — Review + Pause, inside card with spacing */}
-          <div className="card-actions">
-            <button type="button" className="card-actions__btn" onClick={onReviewAnswers}>
-              Review my answers
-            </button>
-            <button type="button" className="card-actions__btn" onClick={onPause}>
-              Pause &amp; save
-            </button>
+              ))
+            )}
+            <div ref={transcriptEndRef} />
           </div>
 
         </div>
@@ -465,6 +514,16 @@ export default function OrbLayout({
         )}
       </div>
       {/* end .orb-scrollable */}
+
+      {/* ── Footer: Review + Pause ── */}
+      <div className="orb-footer">
+        <button type="button" className="orb-footer__btn" onClick={onReviewAnswers}>
+          Review my answers
+        </button>
+        <button type="button" className="orb-footer__btn" onClick={onPause}>
+          Pause &amp; save
+        </button>
+      </div>
 
     </div>
   );
