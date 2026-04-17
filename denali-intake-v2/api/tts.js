@@ -71,17 +71,62 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: 'TTS generation failed' });
     }
 
-    // Stream audio back to client
-    res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Cache-Control', 'no-store');
-
-    // Pipe the response body to the client
+    // Inworld streaming endpoint returns newline-delimited JSON, where each
+    // chunk contains base64-encoded audio in result.audioContent or audioContent.
+    // We collect all chunks, decode them, and send raw MP3 bytes to the client.
     const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    const audioChunks = [];
+    let buffer = '';
 
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
-      res.write(Buffer.from(value));
+      buffer += decoder.decode(value, { stream: true });
+
+      // Process complete JSON lines
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // Keep incomplete line in buffer
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        try {
+          const parsed = JSON.parse(trimmed);
+          const b64 = parsed?.result?.audioContent || parsed?.audioContent;
+          if (b64) {
+            audioChunks.push(Buffer.from(b64, 'base64'));
+          }
+        } catch {
+          // Skip non-JSON lines (e.g. empty lines, delimiters)
+        }
+      }
+    }
+
+    // Process any remaining data in buffer
+    if (buffer.trim()) {
+      try {
+        const parsed = JSON.parse(buffer.trim());
+        const b64 = parsed?.result?.audioContent || parsed?.audioContent;
+        if (b64) {
+          audioChunks.push(Buffer.from(b64, 'base64'));
+        }
+      } catch {
+        // Ignore trailing non-JSON
+      }
+    }
+
+    if (audioChunks.length === 0) {
+      console.error('[TTS] No audio content in Inworld response');
+      return res.status(502).json({ error: 'TTS generation returned no audio' });
+    }
+
+    // Send decoded MP3 audio to client
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Cache-Control', 'no-store');
+
+    for (const chunk of audioChunks) {
+      res.write(chunk);
     }
 
     res.end();
