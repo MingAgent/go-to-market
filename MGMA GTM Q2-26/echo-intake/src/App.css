@@ -164,6 +164,11 @@ body {
   margin: 32px auto;
   width: 200px;
   height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #1a1a2e 0%, #0c0c1a 60%, #060610 100%);
+  border: 1.5px solid rgba(61, 216, 224, 0.15);
+  box-shadow: 0 0 40px rgba(61, 216, 224, 0.06), inset 0 0 60px rgba(6, 6, 16, 0.5);
+  overflow: hidden;
   opacity: 0;
   transform: scale(0.9);
   transition: opacity 0.6s ease, transform 0.6s ease;
@@ -172,20 +177,11 @@ body {
   opacity: 1;
   transform: scale(1);
 }
-/* Visible orb circle behind the waveform */
-.orb-preview::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 40%, #1a1a2e 0%, #0c0c1a 60%, #060610 100%);
-  border: 1.5px solid rgba(61, 216, 224, 0.15);
-  box-shadow: 0 0 40px rgba(61, 216, 224, 0.06);
-}
 .orb-preview-canvas {
   border-radius: 50%;
   position: relative;
   z-index: 1;
+  display: block;
 }
 
 /* Sound-on prompt below orb preview */
@@ -240,12 +236,12 @@ body {
   50% { transform: scale(1.15); opacity: 1; }
 }
 
-/* Consent buttons */
+/* Consent buttons — directly below text, not pushed to bottom */
 .consent-wrap {
   display: flex;
   gap: 16px;
   justify-content: center;
-  margin-top: 32px;
+  margin-top: 24px;
   opacity: 0;
   transition: opacity 0.4s ease;
 }

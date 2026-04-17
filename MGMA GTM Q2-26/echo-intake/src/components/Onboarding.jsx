@@ -67,10 +67,11 @@ export default function Onboarding({ onComplete }) {
     setShowOrbPreview(false);
     setShowSpeakerIcon(false);
     setShowSpeakerHighlight(false);
-    setShowConsent(false);
     setShowSoundOn(false);
     clearLines();
+    // Show name input + consent together
     setShowNameInput(true);
+    setShowConsent(true);
     setTimeout(() => nameRef.current?.focus(), 100);
   }, [clearLines]);
 
@@ -263,6 +264,35 @@ export default function Onboarding({ onComplete }) {
             {currentText}<span className="tw-cursor" />
           </div>
         )}
+
+        {/* Consent buttons — inline with text, directly below "Is that agreeable?" */}
+        {showConsent && (
+          <div className="consent-wrap visible">
+            <button className="consent-btn" onClick={() => {
+              if (consentResolveRef.current) {
+                consentResolveRef.current(true);
+              } else {
+                const name = nameRef.current?.value?.trim() || '';
+                setShowConsent(false);
+                setShowNameInput(false);
+                onComplete(name);
+              }
+            }}>
+              Yes, let&apos;s begin
+            </button>
+            <button className="consent-btn decline" onClick={() => {
+              if (consentResolveRef.current) {
+                consentResolveRef.current(false);
+              } else {
+                setShowConsent(false);
+                setShowNameInput(false);
+                setDeclined(true);
+              }
+            }}>
+              Not right now
+            </button>
+          </div>
+        )}
       </div>
 
       {showNameInput && (
@@ -279,7 +309,7 @@ export default function Onboarding({ onComplete }) {
       )}
 
       {/* Skip intro button — fades in after ~2s, hidden once name input shows */}
-      {showSkipIntro && !showNameInput && (
+      {showSkipIntro && !showNameInput && !showConsent && (
         <button type="button" className="skip-intro-btn" onClick={handleSkipIntro}>
           Skip intro
         </button>
@@ -298,7 +328,6 @@ export default function Onboarding({ onComplete }) {
             </div>
           )}
           {showSpeakerHighlight && <div className="speaker-highlight visible" />}
-          {/* Sound-on prompt — appears 500ms after orb preview */}
           {showSoundOn && (
             <div className="sound-on-prompt visible">
               <span>Tap the orb</span>
@@ -306,17 +335,6 @@ export default function Onboarding({ onComplete }) {
               <span>Sound on &#128266;</span>
             </div>
           )}
-        </div>
-      )}
-
-      {showConsent && (
-        <div className="consent-wrap visible">
-          <button className="consent-btn" onClick={() => consentResolveRef.current?.(true)}>
-            Yes, let's begin
-          </button>
-          <button className="consent-btn decline" onClick={() => consentResolveRef.current?.(false)}>
-            Not right now
-          </button>
         </div>
       )}
     </div>
